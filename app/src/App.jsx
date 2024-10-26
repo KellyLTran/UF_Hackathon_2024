@@ -10,14 +10,30 @@ import icon from "./constants";
 function App() {
     const position = [51.505, -0.09];
 
+    const requestPrediction = async () => {
+        const res = await fetch("http://127.0.0.1:8000/predict", {
+            method: "POST",
+        });
+
+        const data = await res.json();
+        console.log(data);
+    };
+
     return (
-        <MapContainer center={position} zoom={13} style={{ height: "100vh" }}>
-            <TileLayer
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"
-            />
-            <GeoLocate />
-        </MapContainer>
+        <div>
+            <button onClick={requestPrediction}>predict</button>
+            <MapContainer
+                center={position}
+                zoom={13}
+                style={{ height: "100vh" }}
+            >
+                <TileLayer
+                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"
+                />
+                <GeoLocate />
+            </MapContainer>
+        </div>
     );
 }
 
