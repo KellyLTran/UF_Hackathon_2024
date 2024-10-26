@@ -1,25 +1,60 @@
-// import Map from "./Map";
-// import "./App.css";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { useEffect, useState } from "react";
+import "leaflet/dist/leaflet.css";
+
+import "leaflet-control-geocoder/dist/Control.Geocoder.css";
+import "leaflet-control-geocoder/dist/Control.Geocoder.js";
+import L from "leaflet";
+import icon from "./constants";
 
 function App() {
+    const position = [51.505, -0.09];
+
     return (
-        <MapContainer
-            center={[51.505, -0.09]}
-            zoom={13}
-            scrollWheelZoom={false}
-        >
+        <MapContainer center={position} zoom={13} style={{ height: "100vh" }}>
             <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"
             />
-            <Marker position={[51.505, -0.09]}>
-                <Popup>
-                    A pretty CSS3 popup. <br /> Easily customizable.
-                </Popup>
-            </Marker>
+            <GeoLocate />
         </MapContainer>
     );
+}
+
+function GeoLocate() {
+    const map = useMap();
+
+    useEffect(() => {
+        var geocoder = L.Control.Geocoder.nominatim();
+        if (typeof URLSearchParams !== "undefined" && location.search) {
+            // parse /?geocoder=nominatim from URL
+            var params = new URLSearchParams(location.search);
+            var geocoderString = params.get("geocoder");
+            if (geocoderString && L.Control.Geocoder[geocoderString]) {
+                geocoder = L.Control.Geocoder[geocoderString]();
+            } else if (geocoderString) {
+                console.warn("Unsupported geocoder", geocoderString);
+            }
+        }
+
+        L.Control.geocoder({
+            query: "",
+            placeholder: "Search here...",
+            defaultMarkGeocode: false,
+            geocoder,
+        })
+            .on("markgeocode", function (e) {
+                var latlng = e.geocode.center;
+                L.marker(latlng, { icon })
+                    .addTo(map)
+                    .bindPopup(e.geocode.name)
+                    .openPopup();
+                map.fitBounds(e.geocode.bbox);
+            })
+            .addTo(map);
+    }, []);
+
+    return null;
 }
 
 export default App;
