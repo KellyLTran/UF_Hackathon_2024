@@ -19,3 +19,8 @@ def read_root():
 @app.post("/predict")
 def predict():
     return {"result": True}
+
+
+@app.post("/recommend")
+def recommend():
+    return {"result": True}

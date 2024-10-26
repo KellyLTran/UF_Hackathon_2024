@@ -16,7 +16,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-leaflet": "^4.2.1",
-    "us-state-codes": "^1.1.2"
+    "us-state-codes": "^1.1.2",
+    "react-modern-drawer": "^1.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
