@@ -6,6 +6,7 @@ import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.js";
 import L from "leaflet";
 import icon from "./constants";
+import StateCodes from 'us-state-codes';
 
 function App() {
     const position = [51.505, -0.09];
@@ -48,16 +49,48 @@ function GeoLocate() {
 
                 // Extract city, state, and country from the geocoding result (with default values if it is missing)
                 const properties = e.geocode.properties.address || {};
-                const city = properties.city || properties.town || properties.village || "Gainesville";
-                const state = properties.state || "Florida";
-                const country = properties.country || "United States";
+                let city = (properties.city || properties.town || properties.village || "gainesville").toLowerCase();
+                let state = (properties.state || "fl").toLowerCase();
+                let country = (properties.country_code || "us").toLowerCase();
 
-                // Displaying extracted information in the popup for testing purposes
-                L.marker(latlng, { icon })
-                    .addTo(map)
-                    .bindPopup(`${city}, ${state}, ${country}`)
-                    .openPopup();
-                map.fitBounds(e.geocode.bbox);
+                // Convert state to its abbreviation using us-state-codes to have correct formatting for the API
+                state = StateCodes.sanitizeStateCode(state) || StateCodes.getStateCodeByStateName(state) || state;
+
+                // Construct the API URL for Zippopotam.us then fetch the data
+                const apiUrl = `http://api.zippopotam.us/${country}/${state}/${city}`;
+                fetch(apiUrl)
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error("Location data not found.");
+                        }
+                        return response.json();
+                    })
+
+                    // Process, extract, and display the data based on the searched location
+                    .then((data) => {
+                        const places = data.places[0];
+                        const postalCode = data["post code"]; // TODO: ensure this is defined
+                        const placeName = places["place name"];
+                        const longitude = places["longitude"];
+                        const latitude = places["latitude"];
+                        L.marker(latlng, { icon })
+                            .addTo(map)
+                            .bindPopup(
+                                `City: ${placeName}, ${state.toUpperCase()}, ${country.toUpperCase()}<br>
+                                Postal Code: ${postalCode}<br>
+                                Coordinates: ${latitude}, ${longitude}`
+                            )
+                            .openPopup();
+                        map.fitBounds(e.geocode.bbox);
+                    })
+
+                    // For handling other countries outside US 
+                    .catch(() => {
+                        L.marker(latlng, { icon })
+                            .addTo(map)
+                            .bindPopup("Info to be added.") // TODO: display other countries' data
+                            .openPopup();
+                    });
             })
             .addTo(map);
     }, []);
