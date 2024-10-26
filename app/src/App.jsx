@@ -45,9 +45,17 @@ function GeoLocate() {
         })
             .on("markgeocode", function (e) {
                 var latlng = e.geocode.center;
+
+                // Extract city, state, and country from the geocoding result (with default values if it is missing)
+                const properties = e.geocode.properties.address || {};
+                const city = properties.city || properties.town || properties.village || "Gainesville";
+                const state = properties.state || "Florida";
+                const country = properties.country || "United States";
+
+                // Displaying extracted information in the popup for testing purposes
                 L.marker(latlng, { icon })
                     .addTo(map)
-                    .bindPopup(e.geocode.name)
+                    .bindPopup(`${city}, ${state}, ${country}`)
                     .openPopup();
                 map.fitBounds(e.geocode.bbox);
             })
