@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap, WMSTileLayer, LayersControl, LayerGroup} from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, WMSTileLayer, LayersControl, LayerGroup, useMapEvents} from "react-leaflet";
 import { useEffect, useState, React } from "react";
 import ReactDOM from "react-dom/client";
 import "leaflet/dist/leaflet.css";
@@ -35,6 +35,8 @@ function App() {
         const data = await res.json();
         console.log(data);
     };
+    
+
 
     return (
         <div>
@@ -57,31 +59,31 @@ function App() {
                 <LayersControl.Overlay name="Counties">
                     <WMSTileLayer 
                     url="https://tigerweb.geo.census.gov/arcgis/services/Census2020/tigerWMS_Census2020/MapServer/WMSServer?request?"
-                    params={{format: 'image/png', layers:"9", transparent: true}}
+                    params={{format: 'image/png', layers:"9", transparent: true, opacity: 0.3}}
                     />
                 </LayersControl.Overlay>
                 <LayersControl.Overlay name="Current Hazard Warning">
                     <WMSTileLayer 
                     url="https://mapservices.weather.noaa.gov/eventdriven/services/WWA/watch_warn_adv/MapServer/WMSServer?request?"
-                    params={{format: 'image/png', layers:"0", transparent: true}}
+                    params={{format: 'image/png', layers:"0", transparent: true, opacity: 0.3}}
                     />
                 </LayersControl.Overlay>
                 <LayersControl.Overlay name="Current Hazard Watches">
                     <WMSTileLayer 
                     url="https://mapservices.weather.noaa.gov/eventdriven/services/WWA/watch_warn_adv/MapServer/WMSServer?request?"
-                    params={{format: 'image/png', layers:"1", transparent: true}}
+                    params={{format: 'image/png', layers:"1", transparent: true, opacity: 0.3}}
                     />
                 </LayersControl.Overlay>
                 <LayersControl.Overlay name="Peak Storm Surge">
                     <WMSTileLayer 
                     url="https://mapservices.weather.noaa.gov/tropical/services/tropical/NHC_PeakStormSurge/MapServer/WMSServer?request?"
-                    params={{format: 'image/png', layers:"0,1,2", transparent: true}}
+                    params={{format: 'image/png', layers:"0,1,2", transparent: true, opacity: 0.3}}
                     />
                 </LayersControl.Overlay>
                 <LayersControl.Overlay name="CPC Monthly Precipitation Outlook">
                     <WMSTileLayer 
                     url="https://mapservices.weather.noaa.gov/vector/services/outlooks/cpc_mthly_precip_outlk/MapServer/WMSServer?request?"
-                    params={{format: 'image/png', layers:"0", transparent: true}}
+                    params={{format: 'image/png', layers:"0", transparent: true, opacity: 0.3}}
                     />
                 </LayersControl.Overlay>
                 <LayersControl.Overlay name="The NHC & CPC Tropical Weather Summary ">
@@ -102,6 +104,7 @@ function App() {
         </div>
     );
 }
+
 
 function GeoLocate({ setGeoStats }) {
     const map = useMap();
