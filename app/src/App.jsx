@@ -9,7 +9,6 @@ import "leaflet-control-geocoder/dist/Control.Geocoder.js";
 import L from "leaflet";
 import icon from "./constants";
 
-import counties from "./counties.json";
 import Stats from "./Stats";
 import StateCodes from 'us-state-codes';
 
@@ -88,7 +87,7 @@ function App() {
                 <LayersControl.Overlay name="The NHC & CPC Tropical Weather Summary ">
                     <WMSTileLayer 
                     url="https://mapservices.weather.noaa.gov/tropical/services/tropical/NHC_tropical_weather_summary/MapServer/WMSServer?request?"
-                    params={{format: 'image/png', layers:"0,4,9,14,17,20,29", transparent: true, subdomains: 'legend'}}
+                    params={{format: 'image/png', layers:"0,4,9,14,17,20,29", transparent: true}}
                     />
                 </LayersControl.Overlay>
                 </LayersControl>
