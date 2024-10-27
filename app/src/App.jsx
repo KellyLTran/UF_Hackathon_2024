@@ -1,7 +1,9 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import { useEffect, useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap, WMSTileLayer, LayersControl, LayerGroup, useMapEvents} from "react-leaflet";
+import { useEffect, useState, React } from "react";
+import ReactDOM from "react-dom/client";
 import "leaflet/dist/leaflet.css";
 
+  
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.js";
 import L from "leaflet";
@@ -13,7 +15,8 @@ import StateCodes from 'us-state-codes';
 function App() {
     const [showStats, setShowStats] = useState(false);
     const [geoStats, setGeoStats] = useState("");
-    const position = [51.505, -0.09];
+    const position = [28.6, -82.32];
+    
 
     const requestPrediction = async () => {
         const res = await fetch("http://127.0.0.1:8000/predict", {
@@ -32,6 +35,8 @@ function App() {
         const data = await res.json();
         console.log(data);
     };
+    
+
 
     return (
         <div>
@@ -39,16 +44,55 @@ function App() {
                 show stats
             </button>
 
+
             <button onClick={requestPrediction}>predict</button>
             <MapContainer
                 center={position}
-                zoom={13}
+                zoom={7.4}
                 style={{ height: "100vh" }}
-            >
+            >  
                 <TileLayer
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"
+                    url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"    
                 />
+                <LayersControl position="topright">
+                <LayersControl.Overlay name="Counties">
+                    <WMSTileLayer 
+                    url="https://tigerweb.geo.census.gov/arcgis/services/Census2020/tigerWMS_Census2020/MapServer/WMSServer?request?"
+                    params={{format: 'image/png', layers:"9", transparent: true, opacity: 0.3}}
+                    />
+                </LayersControl.Overlay>
+                <LayersControl.Overlay name="Current Hazard Warning">
+                    <WMSTileLayer 
+                    url="https://mapservices.weather.noaa.gov/eventdriven/services/WWA/watch_warn_adv/MapServer/WMSServer?request?"
+                    params={{format: 'image/png', layers:"0", transparent: true, opacity: 0.3}}
+                    />
+                </LayersControl.Overlay>
+                <LayersControl.Overlay name="Current Hazard Watches">
+                    <WMSTileLayer 
+                    url="https://mapservices.weather.noaa.gov/eventdriven/services/WWA/watch_warn_adv/MapServer/WMSServer?request?"
+                    params={{format: 'image/png', layers:"1", transparent: true, opacity: 0.3}}
+                    />
+                </LayersControl.Overlay>
+                <LayersControl.Overlay name="Peak Storm Surge">
+                    <WMSTileLayer 
+                    url="https://mapservices.weather.noaa.gov/tropical/services/tropical/NHC_PeakStormSurge/MapServer/WMSServer?request?"
+                    params={{format: 'image/png', layers:"0,1,2", transparent: true, opacity: 0.3}}
+                    />
+                </LayersControl.Overlay>
+                <LayersControl.Overlay name="CPC Monthly Precipitation Outlook">
+                    <WMSTileLayer 
+                    url="https://mapservices.weather.noaa.gov/vector/services/outlooks/cpc_mthly_precip_outlk/MapServer/WMSServer?request?"
+                    params={{format: 'image/png', layers:"0", transparent: true, opacity: 0.3}}
+                    />
+                </LayersControl.Overlay>
+                <LayersControl.Overlay name="The NHC & CPC Tropical Weather Summary ">
+                    <WMSTileLayer 
+                    url="https://mapservices.weather.noaa.gov/tropical/services/tropical/NHC_tropical_weather_summary/MapServer/WMSServer?request?"
+                    params={{format: 'image/png', layers:"0,4,9,14,17,20,29", transparent: true}}
+                    />
+                </LayersControl.Overlay>
+                </LayersControl>
                 <GeoLocate setGeoStats={setGeoStats} />
                 <Stats
                     isOpen={showStats}
@@ -60,6 +104,7 @@ function App() {
         </div>
     );
 }
+
 
 function GeoLocate({ setGeoStats }) {
     const map = useMap();
@@ -96,5 +141,6 @@ function GeoLocate({ setGeoStats }) {
 
     return null;
 }
+
 
 export default App;
